@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>渲染自定义组件</title>
+  </head>
+  <body>
+    <div id="app">
+      <h1>我是标准的h1标签</h1>
+      <my-button
+        onclick="handleClick"
+        class="submit xx my-button"
+        type="primary"
+      >
+        我是my-button按钮
+      </my-button>
+      <my-title class="blue" title="我是h1元素哦">我是my-title</my-title>
+      <MyButton onclick="handleClick2" type="error">
+        支持多种写法 以及事件绑定
+      </MyButton>
+      <MyTitle level="3">支持h1～h6的多种标签，默认为h1 </MyTitle>
+    </div>
+
+    <script type="module">
+      import { Render } from './render.js'
+      class Components {
+        constructor() {}
+      }
+
+      class MyButton extends Components {}
+      class MyTitle extends Components {}
+
+      const render = new Render({
+        root: '#app',
+        methods: {
+          handleClick() {
+            console.log('按钮点击了')
+          },
+          handleClick2() {
+            alert('按钮点击了')
+          },
+        },
+      })
+    </script>
+  </body>
+</html>
