@@ -2,5 +2,5 @@
 
 ## 面向对象
 
-### [渲染自定义HTML组件](/tree/mian/渲染自定义组件)
+### [渲染自定义HTML组件](/blob/main/渲染自定义组件/README.md)
 
