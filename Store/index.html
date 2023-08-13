@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Store数据共享</title>
+  </head>
+  <body>
+    <script type="module">
+      import { store } from './Store.js'
+
+      const A = store.connect(class {})
+      const B = store.connect(class {})
+
+      const a = new A()
+      const b = new B()
+
+      console.log(a.get('name')) // undefined
+      console.log(a.get('name')) // undefined
+      a.set('name', 'web')
+      a.set('age', 22)
+      a.set('addres', 'xxx')
+
+      console.log(a.get('name')) // 'web'
+      console.log(b.get('name')) // 'web'
+      console.log(a.get('age')) // 22
+      console.log(b.get('age')) // 22
+      console.log(a.show()) // {name: 'web', age: 22, addres: 'xxx'}
+      console.log(b.show()) // {name: 'web', age: 22, addres: 'xxx'}
+      a.deleteByKey('age')
+      console.log(a.show()) // {name: 'web', addres: 'xxx'}
+      console.log(b.show()) // {name: 'web', addres: 'xxx'}
+    </script>
+  </body>
+</html>
