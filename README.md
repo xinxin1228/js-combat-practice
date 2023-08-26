@@ -6,5 +6,7 @@
 
 ### [Store 实现多个 class 之间数据共享](Store/README.md)
 
+### [生成虚拟DOM](生成虚拟DOM/README.md)
+
 
 
