@@ -1,12 +1,11 @@
-# JavaScript实战练习
+# JavaScript 实战练习
 
 ## 面向对象
 
-### [渲染自定义HTML组件](渲染自定义组件/README.md)
+### [渲染自定义 HTML 组件](渲染自定义组件/README.md)
 
 ### [Store 实现多个 class 之间数据共享](Store/README.md)
 
-### [生成虚拟DOM](生成虚拟DOM/README.md)
+### [生成虚拟 DOM](生成虚拟DOM/README.md)
 
-
-
+### [封装 Touch 库](封装Touch库/README.md)
