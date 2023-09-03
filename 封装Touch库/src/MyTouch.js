@@ -24,8 +24,9 @@ const defaultOptions = {
   animateDuration: 300 // 回弹的时长
 }
 
-class MyTouch {
+class MyTouch extends EventQueue {
   constructor(el, options = {}) {
+    super()
     this.el = getEl(el)
     throwError(!this.el.children[0], `${el} 里面必须有一个子元素`)
 
@@ -39,8 +40,6 @@ class MyTouch {
     this.maxScrollX = 0
     this.macScrollY = 0
 
-    // 事件队列
-    this.queue = new EventQueue()
     // 支持的外部监听事件列表
     this.queueList = {
       Start: 'start',
@@ -97,7 +96,7 @@ class MyTouch {
 
   // 进一步抽取各级事件
   _start() {
-    this.queue.$emit(this.queueList.Start, this)
+    super.$emit(this.queueList.Start, this)
   }
   _move() {
     let { x, y } = this.position
@@ -126,7 +125,7 @@ class MyTouch {
       this.container.style.transform = `translateY(${y}px)`
     }
 
-    this.queue.$emit(this.queueList.Move, this, x, y)
+    super.$emit(this.queueList.Move, this, x, y)
   }
   _end() {
     let { x, y } = this.position
@@ -152,14 +151,14 @@ class MyTouch {
       this.container.style.transition = ''
     }, animateDuration)
 
-    this.queue.$emit(this.queueList.End, this, x, y)
+    super.$emit(this.queueList.End, this, x, y)
   }
 
   // 监听事件
   $on(type, callback) {
     throwWarn(!Object.values(this.queueList).includes(type), '未知的事件')
 
-    this.queue.$on(type, callback)
+    super.$on(type, callback)
   }
 }
 
