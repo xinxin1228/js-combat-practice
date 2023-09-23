@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="./utils/EventQueue.js"></script>
+    <script src="./utils/request_fetch.js"></script>
+    <script src="./utils/progress.js"></script>
+    <title>10_实现下载的进度条fetch版</title>
+  </head>
+  <body>
+    <button id="btn">点击下载获取</button>
+
+    <script>
+      const btnEl = document.querySelector('#btn')
+      const fileUrl = 'http://localhost:3000/api/files'
+
+      btnEl.addEventListener('click', async () => {
+        const progress = new Progress()
+
+        // 方案一：使用封装的
+        request.onProgress((loaded, total) => {
+          console.log(loaded, total)
+          progress.onProgress(loaded, total)
+        })
+
+        const data = await request.get(fileUrl)
+        const imgEl = document.createElement('img')
+        imgEl.src = data.url
+        document.body.append(imgEl)
+        console.log(data)
+
+        // 方案二：单独写
+        //   const res = await fetch(fileUrl)
+        //   const reader = res.body.getReader()
+        //   // 获得总长度（length）
+        //   const contentLength = +res.headers.get('Content-Length')
+        //   // 读取数据
+        //   let receivedLength = 0 // 当前接收到了这么多字节
+        //   let chunks = [] // 接收到的二进制块的数组（包括 body）
+        //   while (true) {
+        //     const { done, value } = await reader.read()
+
+        //     if (done) break
+
+        //     chunks.push(value)
+        //     receivedLength += value.length
+
+        //     console.log(receivedLength, contentLength)
+        //     progress.onProgress(receivedLength, contentLength)
+        //   }
+
+        //   // 将块连接到单个 Uint8Array
+        //   let chunksAll = new Uint8Array(receivedLength)
+        //   let position = 0
+        //   for (let chunk of chunks) {
+        //     chunksAll.set(chunk, position)
+        //     position += chunk.length
+        //   }
+
+        //   // 解码成字符串
+        //   let result = new TextDecoder('utf-8').decode(chunksAll)
+        //   let json = JSON.parse(result)
+
+        //   console.log(json)
+        //   const imgEl = document.createElement('img')
+        //   imgEl.src = json.url
+        //   document.body.append(imgEl)
+      })
+    </script>
+  </body>
+</html>

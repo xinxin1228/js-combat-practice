@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="./utils/EventQueue.js"></script>
+    <script src="./utils/request_xhr.js"></script>
+    <title>01_使用xhr发送网络请求</title>
+  </head>
+  <body>
+    <button id="get">Get请求</button>
+    <button id="post">Post请求</button>
+    <button id="put">Put请求</button>
+    <button id="delete">Delete请求</button>
+
+    <script>
+      const getEl = document.querySelector('#get')
+      const postEl = document.querySelector('#post')
+      const putEl = document.querySelector('#put')
+      const deleteEl = document.querySelector('#delete')
+      const baseUrl = 'http://localhost:3000/api'
+
+      getEl.addEventListener('click', async () => {
+        const data = await request.get(`${baseUrl}/users`, {
+          params: {
+            name: 'web',
+            age: 22,
+          },
+        })
+
+        console.log(data)
+      })
+      postEl.addEventListener('click', async () => {
+        const data = await request.post(`${baseUrl}/users`, {
+          name: 'web',
+          age: 22,
+        })
+
+        console.log(data)
+      })
+      putEl.addEventListener('click', async () => {
+        const data = await request.put(`${baseUrl}/users/12`, {
+          name: 'web',
+          age: 22,
+        })
+
+        console.log(data)
+      })
+      deleteEl.addEventListener('click', async () => {
+        const data = await request.delete(`${baseUrl}/users/2`, {
+          name: 'web',
+          age: 22,
+        })
+
+        console.log(data)
+      })
+    </script>
+  </body>
+</html>

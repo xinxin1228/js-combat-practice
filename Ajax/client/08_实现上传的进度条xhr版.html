@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="./utils/EventQueue.js"></script>
+    <script src="./utils/request_xhr.js"></script>
+    <title>08_实现上传的进度条xhr版</title>
+    <style>
+      .file {
+        display: flex;
+      }
+      .btn {
+        margin: 20px 0;
+      }
+      .preview {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin: 15px 0;
+      }
+      .preview-list {
+        height: 60px;
+        margin: 10px;
+        border: 1px dashed #000;
+        border-radius: 6px;
+        width: 300px;
+        padding: 10px;
+        display: flex;
+      }
+      .img {
+        width: 60px;
+        height: 60px;
+        margin-right: 10px;
+        border-radius: 6px;
+        overflow: hidden;
+        display: none;
+        object-fit: contain;
+        background-color: #eee;
+      }
+      .info {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+      }
+      .name {
+        font-size: 14px;
+      }
+      .progress {
+        height: 2px;
+        margin-top: 5px;
+        background-color: #f6f6f6;
+        position: relative;
+      }
+      span {
+        width: 0;
+        height: 2px;
+        position: absolute;
+        left: 0;
+        top: 0;
+        background-color: blue;
+        transition: all 0.3s;
+      }
+      .tip {
+        text-align: center;
+        font-size: 14px;
+        color: #333333;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="file">
+      <div>
+        <h3>单文件上传</h3>
+        <input type="file" id="file1" />
+        <div class="preview preview1">
+          <!--<div class="preview-list">
+          <img class="img" src="" alt="" />
+          <div class="info">
+            <div class="name">02.jpg</div>
+            <div class="tip">文件上传中 （30%）</div>
+            <div class="progress">
+              <span></span>
+            </div>
+          </div>
+        </div> -->
+        </div>
+        <p class="btn1">
+          <button id="btn1">单文件上传</button>
+        </p>
+      </div>
+      <div>
+        <h3>多文件上传</h3>
+        <input type="file" id="file2" multiple />
+        <div class="preview preview2">
+          <!-- <div class="preview-list">
+        <img src="" alt="" />
+        <div class="cz">
+          <img src="./imgs/删除.png" alt="" />
+        </div>
+      </div> -->
+        </div>
+        <p class="btn">
+          <button id="btn2">多文件上传</button>
+        </p>
+      </div>
+    </div>
+
+    <button id="remove">删除所有已上传的文件</button>
+
+    <script>
+      const fileEl1 = document.querySelector('#file1')
+      const fileEl2 = document.querySelector('#file2')
+      const btnEl1 = document.querySelector('#btn1')
+      const btnEl2 = document.querySelector('#btn2')
+      const removeEl = document.querySelector('#remove')
+      const baseUrl = 'http://localhost:3000/api'
+      const uploadUrl = `${baseUrl}/upload`
+      const deleteUrl = `${baseUrl}/files`
+
+      let fileList1 = []
+      let fileList2 = []
+
+      fileEl1.addEventListener('change', () => {
+        fileList1 = [...fileEl1.files]
+      })
+      fileEl2.addEventListener('change', () => {
+        fileList2 = Array.from(fileEl2.files)
+      })
+
+      btnEl1.addEventListener('click', async () => {
+        const formData = new FormData()
+        const render = new Render(
+          document.querySelector('.preview1'),
+          fileList1[0]
+        )
+        formData.append('file', fileList1[0])
+
+        // 方案一：利用封装好的
+        // request.onUploadProgress((loaded, total) => {
+        //   console.log(total, loaded)
+        //   const progress = ((loaded / total) * 100).toFixed(2)
+        //   render.progress(progress)
+        // })
+        // const res = await request.upload(uploadUrl, formData)
+        // console.log(res)
+
+        // 方案二: 单独写
+        const xhr = new XMLHttpRequest()
+        xhr.open('POST', uploadUrl)
+        xhr.upload.addEventListener('progress', e => {
+          console.log(e.total, e.loaded)
+          const progress = ((e.loaded / e.total) * 100).toFixed(2)
+          render.progress(progress)
+        })
+        xhr.send(formData)
+      })
+      btnEl2.addEventListener('click', async () => {
+        // 方案一：利用封装好的
+        // for (const file of fileList2) {
+        //   const requestItem = new Request()
+        //   const render = new Render(document.querySelector('.preview2'), file)
+        //   const formData = new FormData()
+        //   formData.append('file', file)
+        //   requestItem.onUploadProgress((loaded, total) => {
+        //     console.log(total, loaded)
+        //     const progress = ((loaded / total) * 100).toFixed(2)
+        //     render.progress(progress)
+        //   })
+        //   requestItem.upload(uploadUrl, formData).then(res => {
+        //     console.log(res)
+        //   })
+        // }
+
+        // 方案二：单独写
+        fileList2.forEach(file => {
+          const render = new Render(document.querySelector('.preview2'), file)
+          const formData = new FormData()
+          formData.append('file', file)
+          const xhr = new XMLHttpRequest()
+          xhr.open('POST', uploadUrl)
+          xhr.upload.addEventListener('progress', e => {
+            console.log(e.total, e.loaded)
+            const progress = ((e.loaded / e.total) * 100).toFixed(2)
+            render.progress(progress)
+          })
+          xhr.send(formData)
+          xhr.addEventListener('load', () => {
+            try {
+              console.log(JSON.parse(xhr.responseText))
+            } catch (error) {
+              console.log(xhr.responseText)
+            }
+          })
+        })
+      })
+
+      // 清除
+      removeEl.addEventListener('click', async () => {
+        await request.delete(deleteUrl)
+        alert('清除成功!')
+      })
+
+      class Render {
+        constructor(previewEl, file) {
+          this.previewEl = previewEl
+          this.file = file
+
+          this._init()
+        }
+
+        _init() {
+          this.listEl = document.createElement('div')
+          this.listEl.classList.add('preview-list')
+          this.listEl.innerHTML = `
+            <img class="img" src="" alt="" />
+            <div class="info">
+              <div class="name">${this.file.name}</div>
+              <div class="tip"></div>
+              <div class="progress">
+                <span></span>
+              </div>
+            </div>
+          `
+          this.previewEl.append(this.listEl)
+        }
+
+        progress(progressing) {
+          this.progressing = progressing
+          const progressEl = this.listEl.querySelector('.progress span')
+          const nameEl = this.listEl.querySelector('.name')
+          const tipEl = this.listEl.querySelector('.tip')
+          const imgEl = this.listEl.querySelector('.img')
+
+          progressEl.style.width = `${this.progressing}%`
+          tipEl.textContent = `文件上传中 （${this.progressing}%）`
+          if (this.progressing < 100) {
+            progressEl.style.display = 'block'
+            nameEl.style.display = 'none'
+            tipEl.style.display = 'block'
+          } else {
+            setTimeout(async () => {
+              progressEl.parentNode.style.display = 'none'
+              nameEl.style.display = 'block'
+              tipEl.style.display = 'none'
+              imgEl.src = await getImgUrl(this.file)
+              imgEl.style.display = 'block'
+            }, 500)
+          }
+        }
+      }
+
+      /**
+       * 获取图片的可访问地址
+       * @param {file} file 需要转换的file对象
+       */
+      function getImgUrl(file) {
+        return new Promise((resolve, reject) => {
+          // 转化为BlOB对象
+          try {
+            const url = URL.createObjectURL(file)
+            resolve(url)
+          } catch (error) {
+            reject(error)
+          }
+          // 转化为Base64
+          // const fileReader = new FileReader()
+          // fileReader.addEventListener('load', () => {
+          //   resolve(fileReader.result)
+          // })
+          // fileReader.addEventListener('error', () => {
+          //   reject(fileReader.error)
+          // })
+          // fileReader.readAsDataURL(file)
+        })
+      }
+    </script>
+  </body>
+</html>

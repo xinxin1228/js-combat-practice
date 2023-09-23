@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="./utils/EventQueue.js"></script>
+    <script src="./utils/request_xhr.js"></script>
+    <script src="./utils/progress.js"></script>
+    <title>09_实现下载的进度条xhr版</title>
+  </head>
+  <body>
+    <button id="btn">点击下载获取</button>
+
+    <script>
+      const btnEl = document.querySelector('#btn')
+      const fileUrl = 'http://localhost:3000/api/files'
+
+      btnEl.addEventListener('click', async () => {
+        const progress = new Progress()
+
+        // 方案一：使用封装的
+        // request.onProgress((loaded, total) => {
+        //   console.log(loaded, total)
+        //   progress.onProgress(loaded, total)
+        // })
+
+        // const data = await request.get(fileUrl)
+        // const imgEl = document.createElement('img')
+        // imgEl.src = data.url
+
+        // document.body.append(imgEl)
+        // console.log(data)
+
+        // 方案二：单独写
+        const xhr = new XMLHttpRequest()
+        xhr.open('GET', fileUrl)
+        xhr.addEventListener('progress', e => {
+          console.log(e.total, e.loaded)
+          progress.onProgress(e.loaded, e.total)
+        })
+        xhr.send()
+
+        xhr.addEventListener('load', () => {
+          try {
+            const json = JSON.parse(xhr.responseText)
+            console.log(json)
+            const imgEl = document.createElement('img')
+            imgEl.src = json.url
+
+            document.body.append(imgEl)
+          } catch (error) {
+            console.log('err', error)
+          }
+        })
+      })
+    </script>
+  </body>
+</html>

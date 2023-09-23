@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>03_input[file]选择文件并且反显桌面</title>
+    <style>
+      .preview {
+        display: flex;
+        gap: 15px;
+        margin: 15px 0;
+      }
+      .preview-list {
+        width: 100px;
+        height: 100px;
+        background-color: #ccc;
+        position: relative;
+        transition: all 0.3s;
+      }
+      .preview-list:hover .cz {
+        display: flex;
+      }
+      img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: contain;
+      }
+      .cz {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        left: 0;
+        top: 0;
+        justify-content: center;
+        align-items: center;
+        display: none;
+        background-color: rgba(0, 0, 0, 0.5);
+      }
+      .cz img {
+        width: 30px;
+        height: 30px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <input type="file" id="file" multiple />
+    <div class="preview">
+      <!-- <div class="preview-list">
+        <img src="" alt="" />
+        <div class="cz">
+          <img src="./imgs/删除.png" alt="" />
+        </div>
+      </div> -->
+    </div>
+    <button id="btn">上传选择的文件</button>
+
+    <script>
+      const fileEl = document.querySelector('#file')
+      const previewEl = document.querySelector('.preview')
+      const btnEl = document.querySelector('#btn')
+      let fileList = [] // 真实上传的文件
+
+      fileEl.addEventListener('change', () => {
+        fileList = [...fileEl.files]
+
+        render()
+      })
+
+      btnEl.addEventListener('click', () => {
+        const formData = new FormData()
+        fileList.forEach(file => {
+          formData.append('file', file)
+        })
+        console.log('真实上传的文件', formData.getAll('file'))
+      })
+
+      // 选择后文件后反显
+      async function render() {
+        const domEl = document.createDocumentFragment()
+        previewEl.innerHTML = ''
+
+        for (const fileIndex in fileList) {
+          const listEl = document.createElement('div')
+          const file = fileList[fileIndex]
+          const url = await getImgUrl(file)
+
+          listEl.classList.add('preview-list')
+          listEl.innerHTML = `
+            <img src=${url} alt="" title=${file.name}/>
+            <div class="cz">
+              <img src="./imgs/删除.png" onclick='deleteImg(${fileIndex})' alt="" />
+            </div>`
+
+          domEl.append(listEl)
+        }
+        previewEl.append(domEl)
+      }
+
+      /**
+       * 获取图片的可访问地址
+       * @param {file} file 需要转换的file对象
+       */
+      function getImgUrl(file) {
+        return new Promise((resolve, reject) => {
+          // 转化为BlOB对象
+          try {
+            const url = URL.createObjectURL(file)
+            resolve(url)
+          } catch (error) {
+            reject(error)
+          }
+          // 转化为Base64
+          // const fileReader = new FileReader()
+          // fileReader.addEventListener('load', () => {
+          //   resolve(fileReader.result)
+          // })
+          // fileReader.addEventListener('error', () => {
+          //   reject(fileReader.error)
+          // })
+          // fileReader.readAsDataURL(file)
+        })
+      }
+      /**
+       * 删除选择的图片
+       * @param {number} fileIndex 选择的图片的索引
+       */
+      function deleteImg(fileIndex) {
+        fileList.splice(fileIndex, 1)
+        console.log(fileList)
+
+        render()
+      }
+    </script>
+  </body>
+</html>
