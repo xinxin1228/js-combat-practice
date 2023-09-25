@@ -10,7 +10,7 @@ const removeFiles = (pathUrl) => {
 
   files.forEach((file) => {
     const filePath = `${pathUrl}/${file}`
-    rmSync(filePath)
+    rmSync(filePath, { recursive: true })
   })
 
   console.log('🚀  ~ 原文件夹文件已全部删除～')

@@ -128,13 +128,14 @@
       })
       btnEl2.addEventListener('click', async () => {
         const formData = new FormData()
+        fileList.forEach(file => formData.append('file', file))
+
         // 方案一：利用封装好的
         // const res = await request.upload(uploadUrl, formData, 2)
         // console.log(res)
 
         // 方案二：单独写
         const xhr = new XMLHttpRequest()
-        fileList.forEach(file => formData.append('file', file))
         xhr.open('POST', uploadUrl)
         xhr.send(formData)
         xhr.addEventListener('load', () => {
