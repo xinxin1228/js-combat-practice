@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="./js/axios.min.js"></script>
+    <title>11_使用axios发送网络请求</title>
+  </head>
+  <body>
+    <button id="get">Get请求</button>
+    <button id="post">Post请求</button>
+    <button id="put">Put请求</button>
+    <button id="delete">Delete请求</button>
+
+    <script>
+      const getEl = document.querySelector('#get')
+      const postEl = document.querySelector('#post')
+      const putEl = document.querySelector('#put')
+      const deleteEl = document.querySelector('#delete')
+      const baseUrl = 'http://localhost:3000/api'
+
+      getEl.addEventListener('click', async () => {
+        const data = await axios.get(`${baseUrl}/users`, {
+          params: {
+            name: 'web',
+            age: 22,
+          },
+        })
+
+        console.log(data.data)
+      })
+      postEl.addEventListener('click', async () => {
+        const data = await axios.post(`${baseUrl}/users`, {
+          name: 'web',
+          age: 22,
+        })
+
+        console.log(data.data)
+      })
+      putEl.addEventListener('click', async () => {
+        const data = await axios.put(`${baseUrl}/users/12`, {
+          name: 'web',
+          age: 22,
+        })
+
+        console.log(data.data)
+      })
+      deleteEl.addEventListener('click', async () => {
+        const data = await axios.delete(`${baseUrl}/users/2`, {
+          name: 'web',
+          age: 22,
+        })
+
+        console.log(data.data)
+      })
+    </script>
+  </body>
+</html>

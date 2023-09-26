@@ -579,8 +579,38 @@ client
 
 ```
 
-####
-
-### 附：使用 axios 实现相同的效果
+### 附：使用 `axios` 实现相同的效果
 
 ---
+
+#### `axios`实现上传与下载进度
+
+```js
+// 上传文件 并且显示上传进度
+const uploadUrl = 'http://localhost:3000/api/upload'
+const formData = new FormData()
+
+inputEl.addEventlistener('click', e => {
+  for (const file of e.files) {
+    formData.append('file', file)
+  }
+})
+
+
+axios.post(uploadUrl, formData, {
+  // 上传进度
+  onUploadProgress: e => {
+    const progress = ((e.loaded / e.total) * 100).toFixed(2)
+    console.log(e.loaded, e.total)
+  },
+})
+
+axios.get(fileUrl, {
+  // 下载进度
+  onDownloadProgress: e => {
+    const progress = ((e.loaded / e.total) * 100).toFixed(2)
+    console.log(e.loaded, e.total)
+  },
+})
+```
+
