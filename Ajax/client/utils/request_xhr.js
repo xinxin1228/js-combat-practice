@@ -9,6 +9,7 @@ class Request extends EventQueue {
     this._init.upload = this.upload.bind(this)
     this._init.onProgress = this.onProgress.bind(this)
     this._init.onUploadProgress = this.onUploadProgress.bind(this)
+    this._init.onAbort = this.onAbort.bind(this)
 
     return this._init
   }
@@ -53,27 +54,27 @@ class Request extends EventQueue {
     }
 
     return new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest()
+      this.xhr = new XMLHttpRequest()
 
-      xhr.open(this.methods, this.url)
-      xhr.setRequestHeader('Content-Type', 'application/json')
-      xhr.upload.addEventListener('progress', e => {
+      this.xhr.open(this.methods, this.url)
+      this.xhr.setRequestHeader('Content-Type', 'application/json')
+      this.xhr.upload.addEventListener('progress', e => {
         this.$emits('uploadProgress', e.loaded, e.total)
       })
-      xhr.addEventListener('progress', e => {
+      this.xhr.addEventListener('progress', e => {
         this.$emits('progress', e.loaded, e.total)
       })
-      xhr.send(JSON.stringify(this.params))
+      this.xhr.send(JSON.stringify(this.params))
 
-      xhr.addEventListener('load', () => {
+      this.xhr.addEventListener('load', () => {
         try {
-          resolve(JSON.parse(xhr.responseText))
+          resolve(JSON.parse(this.xhr.responseText))
         } catch (error) {
-          resolve(xhr.responseText)
+          resolve(this.xhr.responseText)
         }
       })
-      xhr.addEventListener('error', () => {
-        reject(xhr.responseText)
+      this.xhr.addEventListener('error', () => {
+        reject(this.xhr.responseText)
       })
     })
   }
@@ -107,24 +108,24 @@ class Request extends EventQueue {
 
     maxCount && data.append('maxCount', maxCount)
     return new Promise((resolve, reject) => {
-      const xhr = new XMLHttpRequest()
-      xhr.open('POST', url)
+      this.xhr = new XMLHttpRequest()
+      this.xhr.open('POST', url)
 
-      xhr.upload.addEventListener('progress', e => {
+      this.xhr.upload.addEventListener('progress', e => {
         this.$emits('uploadProgress', e.loaded, e.total)
       })
 
-      xhr.send(data)
+      this.xhr.send(data)
 
-      xhr.addEventListener('load', () => {
+      this.xhr.addEventListener('load', () => {
         try {
-          resolve(JSON.parse(xhr.responseText))
+          resolve(JSON.parse(this.xhr.responseText))
         } catch (error) {
-          resolve(xhr.responseText)
+          resolve(this.xhr.responseText)
         }
       })
-      xhr.addEventListener('error', () => {
-        reject(xhr.responseText)
+      this.xhr.addEventListener('error', () => {
+        reject(this.xhr.responseText)
       })
     })
   }
@@ -142,6 +143,10 @@ class Request extends EventQueue {
    */
   onProgress(callback) {
     this.$on('progress', callback)
+  }
+  // 取消请求
+  onAbort() {
+    this.xhr.abort?.()
   }
 }
 

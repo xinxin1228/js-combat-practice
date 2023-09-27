@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="./utils/EventQueue.js"></script>
+    <script src="./utils/request_fetch.js"></script>
+    <title>15_实现拖拽上传fetch版</title>
+    <style>
+      .drag-list {
+        display: flex;
+        gap: 0 20px;
+      }
+      .drag {
+        width: 340px;
+        height: 190px;
+        border: 2px dashed #eee;
+        border-radius: 10px;
+        font-size: 14px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        color: #999;
+        cursor: pointer;
+        transition: all 0.3s;
+      }
+      .drag:hover,
+      .drag-over {
+        color: #3875f6;
+        border-color: #3875f6;
+      }
+
+      .drag span {
+        margin: 10px;
+      }
+      .file-list {
+        font-size: 13px;
+        display: flex;
+        align-items: center;
+        margin: 8px;
+        transition: all 0.3s;
+        position: relative;
+      }
+      .file-list:hover {
+        background-color: #f5f5f5;
+      }
+      .file-list span {
+        flex: 1;
+      }
+      .file-list img {
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+      }
+      .file-list .progress {
+        position: absolute;
+        width: 0;
+        height: 2px;
+        background-color: #3875f6;
+        bottom: -3px;
+        transition: width 0.3s;
+      }
+      .input {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="drag-list">
+      <div class="drag-item">
+        <h2>拖拽上传</h2>
+        <div class="drag-container">
+          <input type="file" class="input input1" multiple />
+          <div class="drag drag1">
+            <span>拖拽文件到此处</span>
+            <span>点击上传文件</span>
+          </div>
+          <div class="files"></div>
+          <!-- <div class="file-list">
+            <span>这是文件名称</span>
+            <img src="./imgs/删除.png" alt="" />
+            <div class="progress"></div>
+          </div>
+          <div class="file-list">
+            <span>这是文件名称</span>
+            <img src="./imgs/删除.png" alt="" />
+            <div class="progress"></div>
+          </div>
+          <div class="file-list">
+            <span>这是文件名称</span>
+            <img src="./imgs/删除.png" alt="" />
+            <div class="progress"></div>
+          </div> -->
+        </div>
+      </div>
+      <div class="drag-item">
+        <h2>手动上传</h2>
+        <div class="drag-container">
+          <input type="file" class="input input2" multiple />
+          <div class="drag drag2">
+            <span>拖拽文件到此处</span>
+            <span>点击上传文件</span>
+          </div>
+          <div class="files"></div>
+          <button style="margin: 10px 0" id="btn">点击上传</button>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      const dragEl1 = document.querySelector('.drag1')
+      const dragEl2 = document.querySelector('.drag2')
+      const inputEl1 = document.querySelector('.input1')
+      const inputEl2 = document.querySelector('.input2')
+      const btnEl = document.querySelector('#btn')
+      const uploadUrl = 'http://localhost:3000/api/upload'
+      const fileList2 = []
+      const domList2 = []
+
+      dragEl1.addEventListener('dragover', e => handleDragover(e, dragEl1))
+      dragEl1.addEventListener('dragleave', () => handleDragleave(dragEl1))
+      dragEl2.addEventListener('dragover', e => handleDragover(e, dragEl2))
+      dragEl2.addEventListener('dragleave', () => handleDragleave(dragEl2))
+
+      dragEl1.addEventListener('drop', e => {
+        e.preventDefault()
+
+        showFileList(dragEl1, e.dataTransfer.files)
+      })
+      dragEl2.addEventListener('drop', e => {
+        e.preventDefault()
+
+        showFileList(dragEl2, e.dataTransfer.files, false)
+      })
+      btnEl.addEventListener('click', () => {
+        console.log('x', fileList2, domList2)
+        fileList2.forEach((file, index) => {
+          const requestItem = new Request()
+          const formData = new FormData()
+
+          formData.append('file', file)
+
+          requestItem.upload(uploadUrl, formData)
+          // requestItem.onUploadProgress((loaded, total) => {
+          //   domList2[index].onProgress(loaded, total)
+          // })
+        })
+      })
+
+      // 点击上传
+      dragEl1.addEventListener('click', () => inputEl1.click())
+      dragEl2.addEventListener('click', () => inputEl2.click())
+      inputEl1.addEventListener('change', () => {
+        showFileList(dragEl1, inputEl1.files)
+      })
+      inputEl2.addEventListener('change', () => {
+        showFileList(dragEl2, inputEl2.files, false)
+      })
+
+      // 拖入
+      function handleDragover(e, dragEl) {
+        e.preventDefault()
+        dragEl.classList.add('drag-over')
+      }
+      // 离开
+      function handleDragleave(dragEl) {
+        dragEl.classList.remove('drag-over')
+      }
+
+      /**
+       * 显示上传的文件列表
+       * @param {object} dragEl 需要挂载的对象
+       * @param {Array<file>} fileList 文件列表
+       * @param {boolean} isAutoUpload 是否自动上传
+       */
+      async function showFileList(dragEl, fileList, isAutoUpload = true) {
+        const domEl = document.createDocumentFragment()
+
+        for (const file of fileList) {
+          //  自动上传
+          if (isAutoUpload) {
+            const requestItem = new Request()
+            const render = new Render(domEl, file, requestItem)
+            const formData = new FormData()
+            formData.append('file', file)
+
+            requestItem.upload(uploadUrl, formData)
+            // requestItem.onUploadProgress((loaded, total) => {
+            //   render.onProgress(loaded, total)
+            // })
+          } else {
+            const render = new Render(domEl, file)
+            fileList2.push(file)
+            domList2.push(render)
+          }
+        }
+
+        dragEl.nextElementSibling.append(domEl)
+      }
+
+      class Render {
+        /**
+         * @param {object} domEl 需要挂载的对象
+         * @param {object} file 需要上传的文件
+         * @param {object} requestItem 请求实例
+         */
+        constructor(domEl, file, requestItem = {}) {
+          this._init(domEl, file, requestItem)
+        }
+
+        _init(domEl, file, requestItem) {
+          this.listEl = document.createElement('div')
+          this.listEl.classList.add('file-list')
+          this.requestItem = requestItem
+
+          this.listEl.innerHTML = `
+            <span>${file.name}</span>
+            <img src="./imgs/删除.png" alt="" />
+            <div class="progress"></div>
+          `
+          this.progressEl = this.listEl.querySelector('.progress')
+
+          this.listEl
+            .querySelector('img')
+            .addEventListener('click', function () {
+              const findIndex = [
+                ...this.parentNode.parentNode.querySelectorAll('.file-list'),
+              ].findIndex(item => item === this.parentNode)
+
+              fileList2.splice(findIndex, 1)
+              domList2.splice(findIndex, 1)
+              this.parentNode.remove()
+              requestItem.onAbort?.()
+            })
+
+          domEl.append(this.listEl)
+        }
+
+        onProgress(loaded, total) {
+          const progressing = ((loaded / total) * 100).toFixed(2)
+
+          if (progressing < 100) {
+            this.progressEl.style.width = progressing + '%'
+            this.progressEl.style.display = 'block'
+          } else {
+            this.progressEl.style.width = progressing + '%'
+            setTimeout(() => {
+              this.progressEl.style.display = 'none'
+            }, 300)
+          }
+        }
+      }
+    </script>
+  </body>
+</html>

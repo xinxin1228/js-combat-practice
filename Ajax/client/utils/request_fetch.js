@@ -8,6 +8,9 @@ class Request extends EventQueue {
     this._init.delete = this.delete.bind(this)
     this._init.upload = this.upload.bind(this)
     this._init.onProgress = this.onProgress.bind(this)
+    this.controller = new AbortController()
+    this.signal = this.controller.signal
+    this._init.onAbort = this.onAbort.bind(this)
 
     return this._init
   }
@@ -45,6 +48,7 @@ class Request extends EventQueue {
           headers: {
             'Content-Type': 'application/json',
           },
+          signal: this.signal,
           body:
             this.methods.toUpperCase() === 'GET'
               ? undefined
@@ -109,6 +113,7 @@ class Request extends EventQueue {
         const res = await fetch(url, {
           method: 'POST',
           body: data,
+          signal: this.signal,
         })
         const json = await res.json()
         resolve(json)
@@ -117,8 +122,13 @@ class Request extends EventQueue {
       }
     })
   }
+  // 请求进度
   onProgress(callback) {
     this.$on('fetch-progress', callback)
+  }
+  // 取消请求
+  onAbort() {
+    this.controller.abort?.()
   }
 }
 
