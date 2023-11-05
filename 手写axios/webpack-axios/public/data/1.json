@@ -1,0 +1,13 @@
+{
+  "name": "web",
+  "list": [
+    {
+      "name": "react",
+      "age": 22
+    },
+    {
+      "name": "angular",
+      "age": 20
+    }
+  ]
+}
