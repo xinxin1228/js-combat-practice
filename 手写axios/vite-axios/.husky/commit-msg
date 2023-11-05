@@ -1,0 +1,7 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+
+echo "🚀 ~ 请使用提交规范来提交代码"
+
+npx --no-install commitlint --edit "$1"

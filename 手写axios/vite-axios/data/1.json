@@ -1,0 +1,7 @@
+{
+  "name": "测试数据",
+  "list": [
+    { "name": "web", "age": 22 },
+    { "name": "react", "age": 23 }
+  ]
+}
