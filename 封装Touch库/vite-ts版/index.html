@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>封装Touch库</title>
+  </head>
+  <body>
+    <div class="app">
+      <div class="app-scroll">
+        <h1>
+          为什么？原因很简单：Object.keys 仅返回带有 enumerable
+          标志的属性。为了检查它，该方法会对每个属性调用内部方法
+          [[GetOwnProperty]] 来获取
+        </h1>
+
+        <div class="swiper">
+          <div class="swiper-banner">
+            <div class="swiper-item">1</div>
+            <div class="swiper-item">2</div>
+            <div class="swiper-item">3</div>
+            <div class="swiper-item">4</div>
+            <div class="swiper-item">5</div>
+          </div>
+        </div>
+
+        <h1>
+          它的描述符（descriptor）。在这里，由于没有属性，其描述符为空，没有
+          enumerable 标志，因此它被略过。 为了让 Object.keys
+          返回一个属性，我们需要它要么存在于带有 enumerable
+        </h1>
+      </div>
+      <div class="tip top"></div>
+      <div class="tip bottom"></div>
+    </div>
+
+    <script type="module" src="./src/index.ts"></script>
+  </body>
+</html>
