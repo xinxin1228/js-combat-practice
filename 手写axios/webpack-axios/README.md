@@ -1,4 +1,6 @@
-## 手写webpack-axios版本
+# 手写Axios
+
+## webpack版
 
 ### 所用的知识
 

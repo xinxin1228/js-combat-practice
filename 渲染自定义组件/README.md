@@ -1,6 +1,6 @@
-## 渲染自定义组件
+# 渲染自定义组件
 
-### 需求描述
+## 需求描述
 
 - 在`html`模版里直接编写**自定义、非`html`**的标签元素，并且支持多种写法。
 
@@ -14,7 +14,7 @@
 
   `<my-button type='primary' onClick='handleClick'></my-button>`中，`type`指定按钮的状态类型，比如`primary`、`error`等，`onClick`代表给该自定义元素绑定的事件类型
 
-### 准备工作
+## 准备工作
 
 自定义标签`html`代码
 
@@ -32,21 +32,21 @@
 </div>
 ```
 
-### 效果展示
+## 效果展示
 
 渲染自定义标签之前的页面样式和控制台的中`html`结构
 
-#### 渲染之前
+### 渲染之前
 
 ![渲染之前](../images/01.jpg)
 
-#### 渲染之后
+### 渲染之后
 
 ![渲染之后](../images/02.jpg)
 
-### 步骤详情
+## 步骤详情
 
-#### 一、需要编写的类之间的关系
+### 一、需要编写的类之间的关系
 
 在练习中，我们需要将`<my-title>`或`<MyTitle>`替换为`<h1> ~ <h6>`标签，将`<my-button>`或`<MyButton>`替换为`<button>`，因此我们需要创建两个对应的类`MyTitle`和`MyButton`。
 
@@ -59,7 +59,7 @@ class MyButton extends Components {}
 class MyTitle extends Components {}
 ```
 
-#### 二、编写`Render`类
+### 二、编写`Render`类
 
 接下来我们来编写入口函数，我们可以借鉴`Vue`的写法。
 
@@ -114,7 +114,7 @@ class Render {
 }
 ```
 
-#### 三、编写`Components`类
+### 三、编写`Components`类
 
 ```js
 class Components {
@@ -153,7 +153,7 @@ class Components {
 }
 ```
 
-#### 四、编写渲染组件类
+### 四、编写渲染组件类
 
 `MyTitle.js`
 
