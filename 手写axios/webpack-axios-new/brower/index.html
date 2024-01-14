@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>测试axios</title>
+    <script src="../dist/axios.min.js"></script>
+    <style>
+      .result {
+        background-color: #fbf9ff;
+        padding: 20px;
+        border-radius: 10px;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <button id="get">GET请求</button>
+    <button id="post">POST请求</button>
+    <button id="put">PUT请求</button>
+    <button id="delete">DELETE请求</button>
+    <br />
+    <button id="cancel">取消请求</button>
+
+    <div class="result"></div>
+
+    <script>
+      const getEl = document.querySelector('#get')
+      const postEl = document.querySelector('#post')
+      const putEl = document.querySelector('#put')
+      const deleteEl = document.querySelector('#delete')
+      const resultEl = document.querySelector('.result')
+      const cancelEl = document.querySelector('#cancel')
+      let abortController = null
+
+      axios.defaults.baseURL = 'https://reqres.in/'
+
+      getEl.addEventListener('click', () => {
+        abortController = new AbortController()
+
+        axios({
+          url: '/api/users?page=2',
+          method: 'get',
+          signal: abortController.signal
+        }).then(({ data }) => {
+          showResult(data)
+        })
+      })
+      postEl.addEventListener('click', () => {
+        abortController = new AbortController()
+
+        axios
+          .post(
+            '/api/users',
+            {
+              name: 'web',
+              age: 22
+            },
+            {
+              signal: abortController.signal
+            }
+          )
+          .then(({ data }) => {
+            showResult(data)
+          })
+      })
+      putEl.addEventListener('click', () => {
+        abortController = new AbortController()
+
+        axios
+          .put(
+            '/api/users/2',
+            {
+              name: 'morpheus',
+              job: 'zion resident'
+            },
+            {
+              signal: abortController.signal
+            }
+          )
+          .then(({ data }) => {
+            showResult(data)
+          })
+      })
+      deleteEl.addEventListener('click', () => {
+        abortController = new AbortController()
+
+        axios
+          .delete('/api/users/2', {
+            signal: abortController.signal
+          })
+          .then(({ data }) => {
+            showResult('删除成功')
+          })
+      })
+      cancelEl.addEventListener('click', () => {
+        abortController.abort()
+      })
+
+      function showResult(res) {
+        resultEl.innerText = ''
+        resultEl.style.display = 'block'
+
+        resultEl.innerText = JSON.stringify(res, null, 2)
+      }
+    </script>
+  </body>
+</html>
